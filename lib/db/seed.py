@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from random import choice as rc
 import random
 from faker import Faker
@@ -11,10 +12,10 @@ Session = sessionmaker(bind=engine)
 session = Session()
 fake = Faker()
 
-part_name = ['CPU', 'Motherboard','RAM','GPU', 'Case','Monitor','Power Supply','HDD', 
+part_names = ['CPU', 'Motherboard','RAM','GPU', 'Case','Monitor','Power Supply','HDD', 
                'Mouse','Keyboard', 'Cooling Fans','SDD']
 
-brand = {'Case':{'Asus','Dell','MSI','ASRock','Razer'},
+brands = {'Case':{'Asus','Dell','MSI','ASRock','Razer'},
           'Motherboard':{'ASRock','Asus','MSI','Intel','Acer'},
           'CPU':{'AMD','Intel','Qualcomm','IBM','Nvidia'},
           'HDD':{'Toshiba','Samsung','Toshiba','Sony','LG'},
@@ -46,29 +47,39 @@ def delete_records():
 #     return stores, customers, parts
 
 def create_records():
-    for i in range(50):
-        customers = Customer(
-                name=f"{fake.first_name()} {fake.last_name()}",
-                budget=f"${random.randint(100, 2500)}",
-                preference=random.choice(part_name),
+    name = input('Customer name: ')
+    budget = int(input('Customer budget: '))
+    preference = input(f'Customer preference {part_names}: ')
+    customer = Customer(
+            name=name,
+            budget=budget,
+            preference=preference,
+        )
+    
+    store_name = input(f"Store name {stores}: ")
+    quantity = int(input('Input quantity: '))
+    customer_id = int(input("Enter customer ID: "))
+    parts_id = int(input("Enter part ID: "))
+    store = Store(
+                store_name=store_name,
+                quantity=quantity,
+                customer_id=customer_id,
+                parts_id=parts_id
             )
-    for i in range(50):
-        stores = Store(
-                store_name=random.choice(stores),
-                quantity=[random.randint(0,10)],
-            )
-    for i in range(50):
-        parts = Part(
-                part_name=random.choice(part_name),
-                cost=f"${random.randint(100, 1000) if part_name in part_name[:7] else random.randint(20,150)}",
-                brand=random.choice(brand),
-            )
-    session.add_all(customers)
+    part_name = input(f"Part name: {part_names}: ")
+    cost = int(input('Part Cost: '))
+    brand = input(f"Part brand: {brands}: ")
+    part = Part(
+            part_name=part_name,
+            cost=cost,
+            brand=brand,
+        )
+    session.add_all(customer+store+part)
     session.commit()
-    return customers
+    return customer + store + part
 
 if __name__ == '__main__':
-    delete_records()
+    # delete_records()
     create_records()
 
     
